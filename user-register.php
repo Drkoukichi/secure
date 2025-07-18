@@ -30,6 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
     $address = $_POST['address'] ?? '';
     $phone = $_POST['phone'] ?? '';
+    $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $password_confirm = $_POST['password_confirm'] ?? '';
 
@@ -48,6 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $name_esc = str_replace("'", "''", $name);
             $address_esc = str_replace("'", "''", $address);
             $phone_esc = str_replace("'", "''", $phone);
+            $email_esc = str_replace("'", "''", $email);
             $password_esc = str_replace("'", "''", $password);
 
             // ユーザー名重複チェック
@@ -57,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($count > 0) {
                 $error = 'このユーザー名は既に使用されています。';
             } else {
-                $sql = "INSERT INTO user (name, address, phone, password) VALUES ('$name_esc', '$address_esc', '$phone_esc', '$password_esc')";
+                $sql = "INSERT INTO user (name, address, phone, email, password) VALUES ('$name_esc', '$address_esc', '$phone_esc', '$email_esc', '$password_esc')";
                 $db->exec($sql);
                 $success = 'アカウントが正常に作成されました。';
             }
@@ -271,6 +273,7 @@ body {
     ・ユーザー名: <?= $name ?><br>
     ・住所: <?= $address ?><br>
     ・電話番号: <?= $phone ?><br>
+    ・メールアドレス: <?= $email ?><br>
   </div>
   <?php endif; ?>
 
@@ -309,6 +312,18 @@ body {
         class="form-input"
         value="<?= $_POST['phone'] ?? '' ?>"
         placeholder="電話番号を入力（任意）"
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="email" class="form-label">メールアドレス</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        class="form-input"
+        value="<?= $_POST['email'] ?? '' ?>"
+        placeholder="メールアドレスを入力（任意）"
       >
     </div>
 
@@ -354,6 +369,7 @@ body {
   <?= $_POST['name'] ?? '' ?>
   <?= $_POST['address'] ?? '' ?>
   <?= $_POST['phone'] ?? '' ?>
+  <?= $_POST['email'] ?? '' ?>
   </div>
 </div>
 </body>

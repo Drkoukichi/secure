@@ -247,10 +247,11 @@ session_start();
             <h1>美味しい料理を、あなたの元へ 🚚</h1>
             <p>地元の人気レストランから、お気に入りの料理を最短30分でお届けします</p>
             <div style="margin-top: 30px;">
-                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">🍕 ピザ</span>
-                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">🍣 寿司</span>
-                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">🍜 ラーメン</span>
-                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">🍛 カレー</span>
+                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">� ラーメン</span>
+                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">🥞 お好み焼き</span>
+                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">🐙 たこやき</span>
+                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">🥩 ステーキ</span>
+                <span style="background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; margin: 0 10px;">🧁 スイーツ</span>
             </div>
         </div>
     </section>
@@ -280,29 +281,29 @@ session_start();
         <div class="container">
             <h2 style="text-align: center; color: #28a745; margin-bottom: 40px;">🍽️ 人気カテゴリ</h2>
             <div class="categories-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
-                <div class="category-card" onclick="searchCategory('ピザ')" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
-                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🍕</div>
-                    <h3>ピザ</h3>
-                </div>
-                <div class="category-card" onclick="searchCategory('寿司')" style="background: linear-gradient(135deg, #4ecdc4, #6de6dc); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
-                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🍣</div>
-                    <h3>寿司</h3>
-                </div>
                 <div class="category-card" onclick="searchCategory('ラーメン')" style="background: linear-gradient(135deg, #f7b731, #f39c12); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
-                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🍜</div>
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">�</div>
                     <h3>ラーメン</h3>
                 </div>
-                <div class="category-card" onclick="searchCategory('カレー')" style="background: linear-gradient(135deg, #e55039, #e74c3c); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
-                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🍛</div>
-                    <h3>カレー</h3>
+                <div class="category-card" onclick="searchCategory('お好み焼き')" style="background: linear-gradient(135deg, #ff6b6b, #ff8e8e); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🥞</div>
+                    <h3>お好み焼き</h3>
                 </div>
-                <div class="category-card" onclick="searchCategory('ハンバーガー')" style="background: linear-gradient(135deg, #a55eea, #8e44ad); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
-                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🍔</div>
-                    <h3>ハンバーガー</h3>
+                <div class="category-card" onclick="searchCategory('たこやき')" style="background: linear-gradient(135deg, #4ecdc4, #6de6dc); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🐙</div>
+                    <h3>たこやき</h3>
                 </div>
-                <div class="category-card" onclick="searchCategory('中華')" style="background: linear-gradient(135deg, #fd79a8, #e84393); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
-                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🥟</div>
-                    <h3>中華</h3>
+                <div class="category-card" onclick="searchCategory('ステーキ')" style="background: linear-gradient(135deg, #e55039, #e74c3c); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">🥩</div>
+                    <h3>ステーキ</h3>
+                </div>
+                <div class="category-card" onclick="searchCategory('油そば')" style="background: linear-gradient(135deg, #a55eea, #8e44ad); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">�</div>
+                    <h3>油そば</h3>
+                </div>
+                <div class="category-card" onclick="searchCategory('スイーツ')" style="background: linear-gradient(135deg, #fd79a8, #e84393); color: white; padding: 30px 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: transform 0.3s ease;">
+                    <div style="font-size: 2.5rem; margin-bottom: 10px;">�</div>
+                    <h3>スイーツ</h3>
                 </div>
             </div>
         </div>

@@ -63,6 +63,21 @@ if ($food_id > 0) {
             $reviewStmt->bindParam(':food_id', $food_id);
             $reviewStmt->execute();
             $reviews = $reviewStmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // この料理の平均評価を取得
+            $foodRatingStmt = $db->prepare("SELECT ROUND(AVG(rating), 1) as food_avg, COUNT(*) as review_count FROM review WHERE food_id = :food_id");
+            $foodRatingStmt->bindParam(':food_id', $food_id);
+            $foodRatingStmt->execute();
+            $ratingData = $foodRatingStmt->fetch(PDO::FETCH_ASSOC);
+            $foodAverageRating = $ratingData['food_avg'] ?? 0;
+            $totalReviews = $ratingData['review_count'] ?? 0;
+            
+            // レストラン全体の平均評価を取得
+            $overallRatingStmt = $db->query("SELECT ROUND(AVG(rating), 1) as overall_avg FROM review");
+            $overallRating = $overallRatingStmt->fetchColumn();
+            if ($overallRating === false || $overallRating === null) {
+                $overallRating = 0;
+            }
         }
     } catch (PDOException $e) {
         $error = 'データベースエラー: ' . $e->getMessage();
@@ -499,7 +514,11 @@ if ($food_id > 0) {
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-icon">★</span>
-                            <span>評価: 4.8/5.0</span>
+                            <span>この料理の評価: <?= $foodAverageRating > 0 ? $foodAverageRating : '評価なし' ?>/5.0 (<?= $totalReviews ?>件)</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-icon">🏪</span>
+                            <span>レストラン全体評価: <?= $overallRating ?? '3.1' ?>/5.0</span>
                         </div>
                         <div class="info-item">
                             <span class="info-icon">🚚</span>

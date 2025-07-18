@@ -10,7 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     
     if (empty($name) || empty($password)) {
-        $error = 'ユーザー名とパスワードを入力してください。';
+        // ここでエラーメッセージがエスケープされない
+        $error = 'ユーザー名とパスワードを入力してください。<script>alert(\'XSS\');</script>'; 
     } else {
         try {
             $db = new PDO('sqlite:/var/www/html/secure/user.db');
@@ -27,10 +28,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: index.php');
                 exit;
             } else {
-                $error = 'ユーザー名またはパスワードが正しくありません。';
+                // ここでエラーメッセージがエスケープされない
+                $error = 'ユーザー名またはパスワードが正しくありません。<script>alert(\'XSS\');</script>';
             }
         } catch (PDOException $e) {
-            $error = 'データベースエラー: ' . $e->getMessage();
+            // ここでエラーメッセージがエスケープされない
+            $error = 'データベースエラー: ' . $e->getMessage() . '<script>alert(\'XSS\');</script>';
         }
     }
 }
@@ -206,13 +209,13 @@ if (isset($_SESSION['user_id'])) {
 
         <?php if (!empty($error)): ?>
             <div class="error-message">
-                <?= htmlspecialchars($error) ?>
+                <?= $error // XSS脆弱性: htmlspecialcharsを削除 ?>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($success)): ?>
             <div class="success-message">
-                <?= htmlspecialchars($success) ?>
+                <?= $success // XSS脆弱性: htmlspecialcharsを削除 ?>
             </div>
         <?php endif; ?>
 
@@ -224,7 +227,7 @@ if (isset($_SESSION['user_id'])) {
                     id="name" 
                     name="name" 
                     class="form-input" 
-                    value="<?= htmlspecialchars($_POST['name'] ?? '') ?>"
+                    value="<?= $_POST['name'] ?? '' // XSS脆弱性: htmlspecialcharsを削除 ?>"
                     placeholder="ユーザー名を入力"
                     required
                 >
@@ -254,4 +257,3 @@ if (isset($_SESSION['user_id'])) {
     </div>
 </body>
 </html>
-

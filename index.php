@@ -223,7 +223,6 @@ session_start();
         }
     </style>
 </head>
-
 <body>
     <header class="header">
         <div class="container">
@@ -231,12 +230,12 @@ session_start();
                 <a href="index.php" class="logo">🍕 FoodDelivery</a>
                 <div class="auth-buttons">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <span class="user-greeting">こんにちは、<?= htmlspecialchars($_SESSION['user_name']) ?>さん</span>
+                        <span class="user-greeting">こんにちは、<?= ($_SESSION['user_name']) ?>さん</span>
                         <a href="profile.php" class="btn btn-secondary">会員情報</a>
                         <a href="logout.php" class="btn btn-primary">ログアウト</a>
                     <?php else: ?>
                         <a href="login.php" class="btn btn-secondary">ログイン</a>
-                        <a href="user-register.php" class="btn btn-primary">新規会員登録</a>
+                        <a href="user-registory.php" class="btn btn-primary">新規会員登録</a>
                     <?php endif; ?>
                 </div>
             </nav>

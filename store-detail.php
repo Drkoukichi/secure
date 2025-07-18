@@ -1,95 +1,24 @@
 <?php
 session_start();
-require_once 'mail_functions.php';
 
 $food = null;
 $error = '';
 $reviews = [];
 $success = '';
-$orderSuccess = '';
-
-// セッションからメッセージを取得して変数に格納し、セッションからクリア
-if (isset($_SESSION['error'])) {
-    $error = $_SESSION['error'];
-    unset($_SESSION['error']);
-}
-
-if (isset($_SESSION['success'])) {
-    $success = $_SESSION['success'];
-    unset($_SESSION['success']);
-}
-
-if (isset($_SESSION['order_success'])) {
-    $orderSuccess = $_SESSION['order_success'];
-    unset($_SESSION['order_success']);
-}
-
-// 注文処理
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_order'])) {
-    if (!isset($_SESSION['user_id'])) {
-        $_SESSION['error'] = '注文するにはログインが必要です。';
-    } else {
-        $food_id = (int)($_POST['food_id'] ?? 0);
-        
-        if ($food_id > 0) {
-            try {
-                $db = new PDO('sqlite:/var/www/html/secure/store-info.db');
-                $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                
-                // 料理情報を取得
-                $stmt = $db->prepare("SELECT * FROM food WHERE ID = :id");
-                $stmt->bindParam(':id', $food_id);
-                $stmt->execute();
-                $orderFood = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                if ($orderFood) {
-                    // ユーザー情報を取得
-                    $userDb = new PDO('sqlite:/var/www/html/secure/user.db');
-                    $userDb->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                    
-                    $stmt = $userDb->prepare("SELECT * FROM user WHERE id = :id");
-                    $stmt->bindParam(':id', $_SESSION['user_id']);
-                    $stmt->execute();
-                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                    
-                    if ($user && !empty($user['email'])) {
-                        // 注文確認メールを送信
-                        if (sendOrderConfirmationEmail($user['email'], $user['name'], $orderFood['name'])) {
-                            $_SESSION['order_success'] = 'ご注文ありがとうございます！確認メールを送信しました。30-40分後にお届け予定です。';
-                        } else {
-                            $_SESSION['order_success'] = 'ご注文ありがとうございます！30-40分後にお届け予定です。';
-                        }
-                    } else {
-                        $_SESSION['order_success'] = 'ご注文ありがとうございます！30-40分後にお届け予定です。';
-                    }
-                } else {
-                    $_SESSION['error'] = '指定された料理が見つかりません。';
-                }
-            } catch (PDOException $e) {
-                $_SESSION['error'] = 'データベースエラー: ' . $e->getMessage();
-            }
-        } else {
-            $_SESSION['error'] = '無効な料理IDです。';
-        }
-    }
-    // リダイレクトしてPOSTデータを消去
-    header('Location: store-detail.php?id=' . $food_id);
-    exit;
-}
 
 // レビュー投稿処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
     if (!isset($_SESSION['user_id'])) {
-        $_SESSION['error'] = 'レビューを投稿するにはログインが必要です。';
+        $error = 'レビューを投稿するにはログインが必要です。';
     } else {
-        $content = trim($_POST['content'] ?? '');
+        $content = $_POST['content'] ?? '';
         $rating = (int)($_POST['rating'] ?? 0);
         $food_id = (int)($_POST['food_id'] ?? 0);
         
         if (empty($content)) {
-            $_SESSION['error'] = 'レビュー内容を入力してください。';
+            $error = 'レビュー内容を入力してください。';
         } elseif ($rating < 1 || $rating > 5) {
-            $_SESSION['error'] = '評価は1〜5の範囲で選択してください。';
+            $error = '評価は1〜5の範囲で選択してください。';
         } else {
             try {
                 $db = new PDO('sqlite:/var/www/html/secure/store-info.db');
@@ -102,18 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review'])) {
                 $stmt->bindParam(':rating', $rating);
                 
                 if ($stmt->execute()) {
-                    $_SESSION['success'] = 'レビューが投稿されました！';
+                    $success = 'レビューが投稿されました！';
                 } else {
-                    $_SESSION['error'] = 'レビューの投稿に失敗しました。';
+                    $error = 'レビューの投稿に失敗しました。';
                 }
             } catch (PDOException $e) {
-                $_SESSION['error'] = 'データベースエラー: ' . $e->getMessage();
+                $error = 'データベースエラー: ' . $e->getMessage();
             }
         }
     }
-    // リダイレクトしてPOSTデータを消去
-    header('Location: store-detail.php?id=' . $food_id);
-    exit;
 }
 
 // 料理IDを取得
@@ -520,12 +446,6 @@ if ($food_id > 0) {
 
     <main class="main-content">
         <div class="container">
-            <?php if (!empty($orderSuccess)): ?>
-                <div class="success-message">
-                    <?= htmlspecialchars($orderSuccess) ?>
-                </div>
-            <?php endif; ?>
-
             <?php if (!empty($success)): ?>
                 <div class="success-message">
                     <?= htmlspecialchars($success) ?>
@@ -559,12 +479,9 @@ if ($food_id > 0) {
                         </p>
                         <div class="food-actions">
                             <?php if (isset($_SESSION['user_id'])): ?>
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="food_id" value="<?= $food['ID'] ?>">
-                                    <button type="submit" name="submit_order" class="btn btn-primary">
-                                        🛒 注文する
-                                    </button>
-                                </form>
+                                <button class="btn btn-primary" onclick="orderFood(<?= $food['ID'] ?>)">
+                                    🛒 注文する
+                                </button>
                             <?php else: ?>
                                 <a href="login.php" class="btn btn-primary">
                                     ログインして注文
@@ -610,7 +527,7 @@ if ($food_id > 0) {
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <div class="review-form">
                             <h4 style="margin-bottom: 15px; color: #333;">レビューを投稿する</h4>
-                            <?php if (!empty($error)): ?>
+                            <?php if (!empty($error) && strpos($error, 'レビュー') !== false): ?>
                                 <div class="error-message" style="background-color: #f8d7da; color: #721c24; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #f5c6cb;">
                                     <?= htmlspecialchars($error) ?>
                                 </div>
@@ -637,7 +554,7 @@ if ($food_id > 0) {
                                         class="form-textarea" 
                                         placeholder="料理の感想をお聞かせください..."
                                         required
-                                    ></textarea>
+                                    ><?= htmlspecialchars($_POST['content'] ?? '') ?></textarea>
                                 </div>
 
                                 <button type="submit" name="submit_review" class="btn btn-primary">
@@ -667,7 +584,7 @@ if ($food_id > 0) {
                                         <?php endfor; ?>
                                         <span style="margin-left: 8px; color: #6c757d; font-size: 0.9rem;">(<?= $review['rating'] ?>/5)</span>
                                     </div>
-                                    <div class="review-content"><?= nl2br(htmlspecialchars($review['content'])) ?></div>
+                                    <div class="review-content"><?= nl2br($review['content']) ?></div>
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -684,6 +601,12 @@ if ($food_id > 0) {
     </main>
 
     <script>
+        function orderFood(foodId) {
+            if (confirm('この料理を注文しますか？')) {
+                alert('ご注文ありがとうございます！\n注文ID: ' + Math.floor(Math.random() * 10000) + '\n\n配達予定時間: 30分後\nお楽しみにお待ちください！');
+            }
+        }
+
         // 星評価の処理
         document.addEventListener('DOMContentLoaded', function() {
             const stars = document.querySelectorAll('.rating-star');

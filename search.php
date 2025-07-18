@@ -1,4 +1,5 @@
 <?php
+/*
 session_start();
 
 // 検索クエリを取得
@@ -30,7 +31,39 @@ if (!empty($query)) {
         $error = "データベースエラー: " . $e->getMessage();
     }
 }
+*/
 ?>
+
+
+<?php
+$query = isset($_GET['query']) ? trim($_GET['query']) : '';
+
+$results = [];
+$error = '';
+
+if (!empty($query)) {
+    try {
+        $db = new SQLite3('/var/www/html/secure/store-info.db');
+
+        // ユーザーの入力を直接SQLに埋め込む（超危険）
+        $sql = "SELECT * FROM food WHERE name LIKE '%$query%';";
+
+        // 複数文を許可して実行（SELECT＋UPDATEなど）
+        $db->exec($sql); // ← UPDATE等が実行される
+
+        // SELECTの結果は別で取得
+        $resultSet = $db->query("SELECT * FROM food WHERE name LIKE '%$query%';");
+
+        while ($row = $resultSet->fetchArray(SQLITE3_ASSOC)) {
+            $results[] = $row;
+        }
+
+    } catch (Exception $e) {
+        $error = "エラー: " . $e->getMessage();
+    }
+}
+?>
+
 
 <!DOCTYPE html>
 <html lang="ja">
@@ -299,12 +332,12 @@ if (!empty($query)) {
                 <a href="index.php" class="logo">🍕 FoodDelivery</a>
                 <div class="nav-links" style="display: flex; gap: 15px; align-items: center;">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <span style="color: white;">こんにちは、<?= htmlspecialchars($_SESSION['user_name']) ?>さん</span>
+                        <span style="color: white;">こんにちは、<?= ($_SESSION['user_name']) ?>さん</span>
                         <a href="profile.php" class="back-btn">会員情報</a>
                         <a href="logout.php" class="back-btn">ログアウト</a>
                     <?php else: ?>
                         <a href="login.php" class="back-btn">ログイン</a>
-                        <a href="user-register.php" class="back-btn">新規会員登録</a>
+                        <a href="user-registory.php" class="back-btn">新規会員登録</a>
                     <?php endif; ?>
                     <a href="index.php" class="back-btn">← ホームに戻る</a>
                 </div>
@@ -320,7 +353,7 @@ if (!empty($query)) {
                     name="query" 
                     class="search-input" 
                     placeholder="料理名を入力してください"
-                    value="<?= htmlspecialchars($query) ?>"
+                    value="<?= ($query) ?>"
                     required
                 >
                 <button type="submit" class="btn-search">🔍 検索</button>
@@ -332,13 +365,13 @@ if (!empty($query)) {
         <div class="container">
             <?php if (isset($error)): ?>
                 <div class="error-message">
-                    <?= htmlspecialchars($error) ?>
+                    <?= ($error) ?>
                 </div>
             <?php endif; ?>
 
             <?php if (!empty($query)): ?>
                 <div class="results-header">
-                    <h2>「<?= htmlspecialchars($query) ?>」の検索結果</h2>
+                    <h2>「<?= ($query) ?>」の検索結果</h2>
                     <p class="results-count"><?= count($results) ?>件の料理が見つかりました</p>
                 </div>
 
@@ -348,17 +381,17 @@ if (!empty($query)) {
                             <div class="food-card" onclick="viewDetails(<?= $food['ID'] ?>)">
                                 <div class="food-image">
                                     <?php if (!empty($food['image_url'])): ?>
-                                        <img src="<?= htmlspecialchars($food['image_url']) ?>" 
-                                             alt="<?= htmlspecialchars($food['name']) ?>"
+                                        <img src="<?= ($food['image_url']) ?>" 
+                                             alt="<?= ($food['name']) ?>"
                                              onerror="this.style.display='none'; this.parentNode.innerHTML='🍽️';">
                                     <?php else: ?>
                                         🍽️
                                     <?php endif; ?>
                                 </div>
                                 <div class="food-info">
-                                    <div class="food-name"><?= htmlspecialchars($food['name']) ?></div>
+                                    <div class="food-name"><?= ($food['name']) ?></div>
                                     <div class="food-description">
-                                        美味しい<?= htmlspecialchars($food['name']) ?>をお楽しみください
+                                        美味しい<?= ($food['name']) ?>をお楽しみください
                                     </div>
                                     <?php if ($food['review_count'] > 0): ?>
                                         <div class="food-rating">
@@ -391,7 +424,7 @@ if (!empty($query)) {
                     <div class="no-results">
                         <div class="no-results-icon">🔍</div>
                         <h3>検索結果が見つかりませんでした</h3>
-                        <p>「<?= htmlspecialchars($query) ?>」に一致する料理が見つかりませんでした。</p>
+                        <p>「<?= ($query) ?>」に一致する料理が見つかりませんでした。</p>
                         <p>別のキーワードで検索してみてください。</p>
                     </div>
                 <?php endif; ?>

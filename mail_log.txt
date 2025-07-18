@@ -1,0 +1,31 @@
+
+=== 登録確認メール送信ログ ===
+送信日時: 2025-07-11 06:28:47
+宛先: me@koukichi.net
+件名: 【FoodDelivery】会員登録完了のお知らせ
+本文:
+
+test2 様
+
+FoodDeliveryへのご登録、誠にありがとうございます。
+
+アカウントの作成が完了いたしました。
+今後とも、FoodDeliveryをよろしくお願いいたします。
+
+■ ご利用方法 ■
+1. ログインページからログイン
+2. お好みの料理を検索
+3. 注文ボタンをクリック
+4. 美味しい料理をお楽しみください！
+
+何かご不明な点がございましたら、お気軽にお問い合わせください。
+
+────────────────────────
+FoodDelivery カスタマーサポート
+Email: support@fooddelivery.com
+Tel: 03-1234-5678
+────────────────────────
+
+ヘッダー: {"From":"noreply@fooddelivery.com","Reply-To":"support@fooddelivery.com","X-Mailer":"PHP\/8.3.6","Content-Type":"text\/plain; charset=UTF-8"}
+============================
+

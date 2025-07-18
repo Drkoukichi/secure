@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'mail_functions.php';
 
 $error = '';
 $success = '';
@@ -7,14 +8,17 @@ $success = '';
 // 新規登録処理
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
     $address = trim($_POST['address'] ?? '');
     $phone = trim($_POST['phone'] ?? '');
     $password = $_POST['password'] ?? '';
     $password_confirm = $_POST['password_confirm'] ?? '';
     
     // バリデーション
-    if (empty($name) || empty($password)) {
-        $error = 'ユーザー名とパスワードは必須です。';
+    if (empty($name) || empty($email) || empty($password)) {
+        $error = 'ユーザー名、メールアドレス、パスワードは必須です。';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = '有効なメールアドレスを入力してください。';
     } elseif (strlen($password) < 6) {
         $error = 'パスワードは6文字以上で入力してください。';
     } elseif ($password !== $password_confirm) {
@@ -25,25 +29,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
             // ユーザー名の重複チェック
-            $stmt = $db->prepare("SELECT COUNT(*) FROM user WHERE name = :name");
+            $stmt = $db->prepare("SELECT COUNT(*) FROM user WHERE name = :name OR email = :email");
             $stmt->bindParam(':name', $name);
+            $stmt->bindParam(':email', $email);
             $stmt->execute();
             $count = $stmt->fetchColumn();
             
             if ($count > 0) {
-                $error = 'このユーザー名は既に使用されています。';
+                $error = 'このユーザー名またはメールアドレスは既に使用されています。';
             } else {
                 // ユーザー登録
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $db->prepare("INSERT INTO user (name, address, phone, password) VALUES (:name, :address, :phone, :password)");
+                $stmt = $db->prepare("INSERT INTO user (name, email, address, phone, password) VALUES (:name, :email, :address, :phone, :password)");
                 $stmt->bindParam(':name', $name);
+                $stmt->bindParam(':email', $email);
                 $stmt->bindParam(':address', $address);
                 $stmt->bindParam(':phone', $phone);
                 $stmt->bindParam(':password', $hashed_password);
                 
                 if ($stmt->execute()) {
-                    $success = 'アカウントが正常に作成されました。ログインページに移動します。';
-                    header('refresh:2;url=login.php');
+                    // 登録完了メールを送信
+                    if (sendRegistrationEmail($email, $name)) {
+                        $success = 'アカウントが正常に作成されました。確認メールを送信しました。ログインページに移動します。';
+                    } else {
+                        $success = 'アカウントが正常に作成されました。ログインページに移動します。';
+                    }
+                    header('refresh:3;url=login.php');
                 } else {
                     $error = 'アカウントの作成に失敗しました。';
                 }
@@ -257,6 +268,19 @@ if (isset($_SESSION['user_id'])) {
                     class="form-input" 
                     value="<?= htmlspecialchars($_POST['name'] ?? '') ?>"
                     placeholder="ユーザー名を入力"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="email" class="form-label">メールアドレス <span class="required">*</span></label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    class="form-input" 
+                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                    placeholder="メールアドレスを入力"
                     required
                 >
             </div>

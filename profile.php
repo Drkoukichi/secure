@@ -273,6 +273,16 @@ try {
                         </div>
 
                         <div class="info-item">
+                            <div class="info-icon">📧</div>
+                            <div class="info-content">
+                                <div class="info-label">メールアドレス</div>
+                                <div class="info-value <?= empty($user["email"]) ? "empty-value" : "" ?>">
+                                    <?= !empty($user["email"]) ? htmlspecialchars($user["email"]) : "未設定" ?>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
                             <div class="info-icon">🏠</div>
                             <div class="info-content">
                                 <div class="info-label">住所</div>

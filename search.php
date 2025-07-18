@@ -337,7 +337,7 @@ if (!empty($query)) {
                         <a href="logout.php" class="back-btn">ログアウト</a>
                     <?php else: ?>
                         <a href="login.php" class="back-btn">ログイン</a>
-                        <a href="user-registory.php" class="back-btn">新規会員登録</a>
+                        <a href="user-register.php" class="back-btn">新規会員登録</a>
                     <?php endif; ?>
                     <a href="index.php" class="back-btn">← ホームに戻る</a>
                 </div>

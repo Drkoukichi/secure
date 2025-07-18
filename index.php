@@ -235,7 +235,7 @@ session_start();
                         <a href="logout.php" class="btn btn-primary">ログアウト</a>
                     <?php else: ?>
                         <a href="login.php" class="btn btn-secondary">ログイン</a>
-                        <a href="user-registory.php" class="btn btn-primary">新規会員登録</a>
+                        <a href="user-register.php" class="btn btn-primary">新規会員登録</a>
                     <?php endif; ?>
                 </div>
             </nav>

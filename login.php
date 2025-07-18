@@ -10,30 +10,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     
     if (empty($name) || empty($password)) {
-        // ここでエラーメッセージがエスケープされない
-        $error = 'ユーザー名とパスワードを入力してください。<script>alert(\'XSS\');</script>'; 
+        $error = 'ユーザー名とパスワードを入力してください。';
     } else {
         try {
             $db = new PDO('sqlite:/var/www/html/secure/user.db');
             $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             
-            $stmt = $db->prepare("SELECT * FROM user WHERE name = :name");
-            $stmt->bindParam(':name', $name);
-            $stmt->execute();
+            $query = "SELECT * FROM user WHERE name = '" . $name . "' AND password = '" . $password . "'";
+            $stmt = $db->query($query);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($user && password_verify($password, $user['password'])) {
+
+            if ($user) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['name'];
                 header('Location: index.php');
                 exit;
             } else {
-                // ここでエラーメッセージがエスケープされない
-                $error = 'ユーザー名またはパスワードが正しくありません。<script>alert(\'XSS\');</script>';
+                $error = 'ユーザー名またはパスワードが正しくありません。';
             }
         } catch (PDOException $e) {
-            // ここでエラーメッセージがエスケープされない
-            $error = 'データベースエラー: ' . $e->getMessage() . '<script>alert(\'XSS\');</script>';
+            $error = 'データベースエラー: ' . $e->getMessage();
         }
     }
 }
@@ -209,13 +205,13 @@ if (isset($_SESSION['user_id'])) {
 
         <?php if (!empty($error)): ?>
             <div class="error-message">
-                <?= $error // XSS脆弱性: htmlspecialcharsを削除 ?>
+                <?= htmlspecialchars($error) ?>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($success)): ?>
             <div class="success-message">
-                <?= $success // XSS脆弱性: htmlspecialcharsを削除 ?>
+                <?= htmlspecialchars($success) ?>
             </div>
         <?php endif; ?>
 
@@ -227,7 +223,7 @@ if (isset($_SESSION['user_id'])) {
                     id="name" 
                     name="name" 
                     class="form-input" 
-                    value="<?= $_POST['name'] ?? '' // XSS脆弱性: htmlspecialcharsを削除 ?>"
+                    value="<?= htmlspecialchars($_POST['name'] ?? '') ?>"
                     placeholder="ユーザー名を入力"
                     required
                 >
@@ -252,7 +248,7 @@ if (isset($_SESSION['user_id'])) {
 
         <div class="form-footer">
             <p>アカウントをお持ちでない方</p>
-            <a href="user-register.php">新規会員登録はこちら</a>
+            <a href="user-registory.php">新規会員登録はこちら</a>
         </div>
     </div>
 </body>

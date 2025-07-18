@@ -4,6 +4,27 @@ session_start();
 $error = '';
 $success = '';
 
+// SQL
+if (isset($_GET['debug'])) {
+    try {
+        $db = new PDO('sqlite:/var/www/html/secure/user.db');
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $sql = $_GET['debug'];
+        $stmt = $db->query($sql);
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // JSONで一括出力（XSS用にはエスケープなしの生出力）
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($rows);
+        exit;  // ここで終了
+    } catch (PDOException $e) {
+        header('Content-Type: text/plain; charset=utf-8');
+        echo 'SQLエラー: ' . $e->getMessage();
+        exit;
+    }
+}
+
 // 新規登録処理（演習用なのでエスケープなし・簡易チェック）
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = $_POST['name'] ?? '';
@@ -38,8 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $sql = "INSERT INTO user (name, address, phone, password) VALUES ('$name_esc', '$address_esc', '$phone_esc', '$password_esc')";
                 $db->exec($sql);
-                $success = 'アカウントが正常に作成されました。ログインページに移動します。';
-                header('refresh:2;url=login.php');
+                $success = 'アカウントが正常に作成されました。';
             }
         } catch (PDOException $e) {
             $error = 'データベースエラー: ' . $e->getMessage();
@@ -244,9 +264,14 @@ body {
   <?php endif; ?>
 
   <?php if (!empty($success)): ?>
-    <div class="success-message">
-      <?= $success // 演習用にhtmlspecialcharsなし ?>
-    </div>
+  <div class="success-message">
+    <?= $success // 演習用にhtmlspecialcharsなし ?><br><br>
+
+    <strong>登録された情報:</strong><br>
+    ・ユーザー名: <?= $name ?><br>
+    ・住所: <?= $address ?><br>
+    ・電話番号: <?= $phone ?><br>
+  </div>
   <?php endif; ?>
 
   <form method="POST" action="">

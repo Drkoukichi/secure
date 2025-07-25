@@ -248,7 +248,7 @@ if (isset($_SESSION['user_id'])) {
 
         <div class="form-footer">
             <p>アカウントをお持ちでない方</p>
-            <a href="user-registory.php">新規会員登録はこちら</a>
+            <a href="user-register.php">新規会員登録はこちら</a>
         </div>
     </div>
 </body>
